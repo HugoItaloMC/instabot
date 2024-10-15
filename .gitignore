@@ -1,0 +1,47 @@
+# Byte-compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Install logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+*.cover
+*.py,cover
+.cache
+coverage.xml
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# PyCharm project settings
+.idea/
+
+# VS Code project settings
+.vscode/
+
+# macOS specific
+.DS_Store
+
+# Linux specific
+*.swp
+*~
+.cache/
