@@ -6,6 +6,8 @@ from time import sleep
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 
 from utils.cookies_manager import CookiesManager
@@ -13,20 +15,14 @@ from utils.sleepnice import delay
 
 class PipeInstaLike:
     
-    def __init__(self, driver, path):
+    def __init__(self, driver, path, *args):
         self.driver = driver
         self.path = path
     
     def __iter__(self):
-
-        # Gerenciar Cookies #########################
-        cookies = iter(CookiesManager(self.driver))
-        next(cookies)
-        ############################################
-
-        delay('nice')
         self.__io = open(self.path, "r+")
         self.__idx = 0
+        self._actions = ActionChains(self.driver)
         return self
     
     def __next__(self):
@@ -58,7 +54,6 @@ class PipeInstaLike:
                     # BUSCANDO LINK PARA ABRIR FOTO
                     self.driver.get("https://www.instagram.com/%s" % random_like)
                     delay('nice')
-                    actions = ActionChains(self.driver)
                     
                     ### CURTIR PHOTO ######################################################################
                     try:
@@ -68,10 +63,11 @@ class PipeInstaLike:
                         self.driver.refresh()
                         delay('low')
                     else:
-                        actions.move_to_element(photo).click().perform()
+                        self._actions.move_to_element(photo).click().perform()
                         delay('nice')
                     finally:
                         self.driver.refresh()
+                    #########################################################################################
                 
                 self.__idx += 1
                 self.__io.close()

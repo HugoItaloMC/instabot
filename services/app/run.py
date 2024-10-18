@@ -8,7 +8,7 @@ from itertools import islice
 from typing import Iterator, Generator, Tuple
 
 # IMPORTANDO BOT
-from __init__ import InstaDriver
+from __init__ import Driver
 
 
 # OPERACÕES PERMITIDAS (PIPELINES)
@@ -24,12 +24,12 @@ class Schema:
 
     def __iter__(self):
 
-        Request = namedtuple("Request", ("operation", "data")) # ESTRUTURA DA REQUISICÃO ENTRE OBJETOS
+        Request = namedtuple("Request", ("namespaces", "data")) # ESTRUTURA DA REQUISICÃO ENTRE OBJETOS
         
         send = yield
-        if send:  # VERIFICANDO CONTRATO EXTERNO
-            option = (request for request in Request(operation=send.upper(), data=self.data))
-            pipe = self.__logic(args=option)
+        if send:  # VERIFICANDO CONTRATO EXTERNO (tarefas)
+            args: Generator = (request for request in Request(namespaces=send, data=self.data))
+            pipe = self.__logic(args=args)
             send = yield
             if "SET" in send:
                 yield self.__labor(class_=pipe)
@@ -38,15 +38,15 @@ class Schema:
     def __logic(self, args: Generator):
         # RECEBE DADOS E DIRECIONA OPERACÃO PARA SER REALIZADA
 
-        op = next(args)  # VERIFICANDO OPERACÃO
+        namespaces = next(args)  # BUSCANDO NAMESPACES
 
-        truth = True if  op in OPERATIONS_ALLOWERS else None
+        truth = True if  namespaces.operation in OPERATIONS_ALLOWERS else None
         if truth is not None:
             data =  args.send(truth)  # RECOLHENDO DADOS
 
-            if op in OPERATIONS_ALLOWERS:
-                print("OPERATION ON:\t%s" % op)
-                pipe_insta = InstaDriver(data=data, operation=op)
+            if namespaces.operation in OPERATIONS_ALLOWERS:
+                print("OPERATION ON:\t%s" % namespaces.operation)
+                pipe_insta = Driver(data, namespaces.operation, namespaces.cookies_renew, namespaces.cookies_release)
                 return pipe_insta
 
 
@@ -72,9 +72,11 @@ if __name__ == '__main__':
     args.add_argument("--path", type=str, required=True, help="Path file users to manager")
     args.add_argument("--login", action="store_true", required=True, help="CONSTRAING APLICATION")
     args.add_argument("--operation", "-op", type=str, required=True)
+    args.add_argument("--cookies_renew", action="store_true", required=False, help="GET AND STORED NEWS COOKIES")
+    args.add_argument("--cookies_release", action="store_true", required=False, help="USE COOKIES STORED")
+
     namespaces = args.parse_args()
     
-    login = namespaces.login
         
     try:
         if namespaces.login:
@@ -82,7 +84,7 @@ if __name__ == '__main__':
         
             schema = iter(Schema(data=data))
             next(schema)
-            schema.send(namespaces.operation)
+            schema.send(namespaces)
             sleep(1)
             schema.send("SET")
         else:

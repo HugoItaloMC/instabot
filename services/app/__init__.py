@@ -12,19 +12,26 @@ from webdriver_manager.chrome import ChromeDriverManager
 # GERENCIADOR DE ELEMENTOS DA PÁGINA WEB
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
-# PIPES PARA GERENCIAR O INSTAGRAM (CURTIR, COMENTAR, SEGUIR, DESEGUIR)
+
+# PIPES PARA GERENCIAR O INSTAGRAM (LOGIN, CURTIR, COMENTAR, SEGUIR, DESEGUIR)
 from pipes.pipe_like import PipeInstaLike
+from pipes.pipe_login import PipeInstaLogin
 
 # UTILS
+from utils.cookies_manager import CookiesManager
 from utils.sleepnice import delay
 
-class InstaDriver:
-    # Objeto que realiza login no instagram
+class Driver:
+    # OBJETO QUE TEM A INSTÂNCIA PRINCIPAL DO WEBDRIVER
 
-    def __init__(self, data: tuple, operation: str):
+    def __init__(self, data: tuple, operation, *args):
         self.data = data
-        self.operation = operation
+        self.operation: list = operation
+        self.args = args
 
     def __iter__(self):
         self._options = webdriver.ChromeOptions()
@@ -39,13 +46,14 @@ class InstaDriver:
         self._options.binary_location = '/usr/bin/google-chrome'  # Localizacão Chrome
         # Iniciando driver juntamente com protocolo de iteracão no objeto
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=self._options)
+        self.driver.maximize_window()  # MAXIMIZANDO TELA
+        self.cookie_renew: bool = self.args[0]
+        self.cookie_release: bool = self.args[1]
         self._idx = 0
         return self
     
     def __next__(self):
         if not self._idx:
-            self._idx += 1
-            # INIT LOGIN
             try:
                 # OPEN DRIVER CHROME WITH WEB-SITE 
                 self.driver.get("https://www.instagram.com")
@@ -54,34 +62,57 @@ class InstaDriver:
                 # PUT USERNAME
                 self.driver.find_element(By.NAME, 'username').send_keys(self.data.username)
                 delay()
-
                 # PUT PASSWORD
                 self.driver.find_element(By.NAME, 'password').send_keys(self.data.passwd)
-                delay('low')
-
+                delay()
                 # BUTTON LOGIN
                 self.driver.find_element(By.NAME, 'password').send_keys(u'\ue007')
                 delay('nice')
                 self()
+                self._idx += 1
             except StopIteration:
                 return self._idx
     
     def __call__(self, *args, **kw):
+        actions = ActionChains(self.driver)
 
         try:
-            ignorar = self.driver.find_element(By.XPATH, "//button[contains(text(), 'Ignorar')]")
-            if ignorar.is_displayed():
-                print("BOT IDENTIFICADO")
-                ignorar.click()
-            else:
-                print("NENHUM ERRO AO LOGAR A CONTA")
+            # POP BOT IDENTIFICADO
+            ignorar = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Ignorar')]")))
+            print("## WARNING ##: BOT IDENTIFICADO")
+            actions.move_to_element(ignorar).click().perform()
         except Exception:
-            print("## ERROR ## : \t 'BOT NAO IDENTIFICADO'")
-        
-        # Aguardando carregamento completo
-        delay('high')
-        # CHAMANDO OPERACÃO DEFINIDA
+            print("## INFO ## : \t 'BOT NAO IDENTIFICADO'")
 
+            # ARMAZENAR CONTA NA SESSÃO DO BROWSER
+            agora_nao_armazenar = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Salvar informações')]")))
+            actions.move_to_element(agora_nao_armazenar).click().perform()
+
+            # Ñ PERMITIR NOTIFICACÕES
+            agora_nao_notificacoes = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, "//button[text()='Agora não']")))
+            actions.move_to_element(agora_nao_notificacoes).click().perform()
+
+            self.driver.refresh()
+        delay()
+
+        # Gerenciar Cookies ###############################
+        if self.cookie_release:
+            cookies = iter(CookiesManager(self.driver, 
+                            self.data.username, 'release'))
+            next(cookies)
+        
+        if self.cookie_renew:
+            cookies = iter(CookiesManager(self.driver, 
+                            self.data.username, 'renew'))
+            next(cookies)
+        ####################################################
+
+
+        # CHAMANDO OPERACÃO DEFINIDA
         if self.operation == "LIKE":
+
             pipe_like = iter(PipeInstaLike(driver=self.driver, path=self.data.path))
             next(pipe_like)

@@ -2,15 +2,17 @@ import random
 import time
 
 
-def delay(frequency: str = 'low'):
+def delay(frequency: str = ''):
     frequency.lower()
     # frequency : ['low', 'nice', 'high']
     if frequency:
+        timein: int = 0
         if frequency == 'low':
-            time.sleep(random.randint(4, 7))
+            timein = time.sleep(random.randint(6, 11))
         elif frequency == 'nice':
-            time.sleep(random.randint(8, 12))
+            timein = time.sleep(random.randint(9, 14))
         elif frequency == 'high':
-            time.sleep(random.randint(14, 21))
+            timein = time.sleep(random.randint(12, 17))
         else:
-            time.sleep(random.randint(7, 12))
+            timein = time.sleep(random.randint(2, 4))
+        return timein
