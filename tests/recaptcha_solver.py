@@ -1,5 +1,4 @@
-import os
-import random, time
+import random, time, os, asyncio
 
 
 ### TOOL TO DELAY #######################################
@@ -33,12 +32,12 @@ class CaptchaSolver:
             os.makedirs(self.audio_path)
 
         """
-            Objeto com muitas etapas, para uma mulhor manutencão e mantimento
+            Objeto com muitas etapas, para uma melhor manutencão e mantimento
             do código aplicar uma chamada em pilha vinculada ao valor de  índice
-            em uma chamada do objeto com protocolo iterador (loop).
+            em uma chamada do objeto com protocolo iterador em um evento loop.
         """
         
-        self.steps: list = (
+        self.steps: tuple = (
             self.acess_captcha_frame,
             self.click_checkbox_captcha,
             self.switch_to_audio_frame,
@@ -47,25 +46,14 @@ class CaptchaSolver:
             self.submit_response
         )
     
-    def __iter__(self):
-        # RETORNAR OBJETO COMO ITERADOR
+    def __aiter__(self):
+        # RETORNAR OBJETO COMO ITERADOR ASSÍNCRONO
         self.__idx: int = 0
         return self
     
-    def __next__(self):
-        # buscando posicão índice de qual etapa
-        if self.__idx >= len(self.steps):
-            # Se indice for maior que o tamanho da etapada, todas tarefas foram conclúidas
-            raise StopIteration
-        else:
-            # Buscando qual etapa se encontra o objeto
-            step = self.steps[self.__idx]
-            self.__idx += 1
-            return step()  # chamando o objeto como funcão
-
     def __call__(self):
-        # Na chamada do objeto como funcãoo execute de forma assíncrona cada tarefa/etapa
-        event = asyncio.get_event_loop()
+        # UM WRAPPER PARA AS COROUTINAS DO OBJETO
+        event = asyncio.new_event_loop()
         task = event.create_task(self.mainloop())
 
         event.run_until_complete(task)
@@ -74,50 +62,61 @@ class CaptchaSolver:
         for task in awaitable:
             task.cancel()
 
-        gather = asyncio.gather(*awaitable, return_exeptions=True)
+        gather = asyncio.gather(*awaitable)
         event.run_until_complete(gather)
         event.close()
 
-    async def mainloop(self):
-        for step in self:
-            pass  # Executa cada tarefa automaticamente ao chamar o iterador
 
+    async def __anext__(self):
+        if self.__idx >= len(self.steps):
+            raise StopIteration
+        else:
+            # buscando posicão índice de qual etapa
+            # Buscando qual etapa se encontra o objeto
+            step = self.steps[self.__idx]
+            self.__idx += 1
+            await step()  # instânciando métodos
+
+
+    async def mainloop(self):
+        # CHAMANDO ITERADOR DO OBJETO
+        async for step in self:
+            pass
+        return self.__idx
 
     #############################################################################
     #       PRINCIPAIS ETAPAS MÉTODOS EXECUTADOS DENTRO DO ITERADOR             #
     #############################################################################
-    def acess_captcha_frame(self):
+    async def acess_captcha_frame(self):
         print("## INFO ##: ACESSANDO FRAME DO `ReCaptcha`")
-        delay('nice')
+        delay()
     
-    def click_checkbox_captcha(self):
+    async def click_checkbox_captcha(self):
         print("## INFO ##: CLICANDO CHECKBOX RECAPTCHA")
-        delay('low')
+        delay()
     
-    def switch_to_audio_frame(self):
+    async def switch_to_audio_frame(self):
         print("## INFO ##: BUSCANDO FRAME DE CAPTCHA AUDIO")
         delay()
 
         print("##INFO ##: ATIVANDO DESAFIO DE ÁUDIO")
         delay()
     
-    def download_audio(self):
+    async def download_audio(self):
         print("## INFO ##: BAIXANDO ARQUIVO DE AUDIO")
         delay('high')
         xaudio = '** AQUI VAI TER A FONTE DO AUDIO **'
         print("## INFO ##: FONTE ÁUDIO[%s]" % xaudio)
     
-    def recogonize_audio(self):
+    async def recogonize_audio(self):
         delay()
         xkey_captcha = '** AQUI O AUDIO TRADUZIDO **'
         print("## INFO ##: Código ReCaptcha %s" % xkey_captcha)
     
-    def submit_response(self):
+    async def submit_response(self):
         print("## INFO ##: ENVIANDO RESPOSTA DO RECAPTCHA")
         delay('low')
 
 
 if __name__ == '__main__':
-    solver = CaptchaSolver('teste_driver')
-    for steps in solver:
-        pass
+    CaptchaSolver('teste_driver')()

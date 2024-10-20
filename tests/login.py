@@ -50,14 +50,13 @@ class InstaLogin:
             self()
 
             if self.__idx == 2:
-
+                solver = None
                 try:
-                    # SE BOT Ñ FOI IDENTIFICADO VERIFICAR RECAPTCHA
+                    # SE BOT Ñ FOI IDENTIFICADO VERIFICAR SE FOI SOLICITADO RECAPTCHA
                     print('VERIFICANDO RECAPTCHA')
-                    solver = CaptchaSolver("teste_driver")
-                    for step in solver:
-                        pass
-                    self.__idx += 1
+                    CaptchaSolver("teste_driver")()
+                except RuntimeError:
+                    self.__idx -= 1
                 except Exception as err:
                     print("## ERROR ##:\t%s" % err)
                 else:
@@ -66,7 +65,8 @@ class InstaLogin:
                 finally:
                     print("SALVANDO INFORMACÕES DE LOGIN")
                     delay()
-    
+            return self.__idx
+
     
     def __call__(self):
         if self.__idx:
@@ -88,6 +88,9 @@ class InstaLogin:
                 print('%s' % err)
 
 if __name__ == '__main__':
-    login = iter(InstaLogin('driver_teste', 'data_teste'))
-    next(login)
+    if (1 << next(iter(InstaLogin('driver_teste', 'data_teste')))) % 2 == 0:
+        print('OK')
+    else:
+        print("FAILED")
+
 
