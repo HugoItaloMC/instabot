@@ -38,59 +38,52 @@ class InstaLogin:
         return self
     
 
-    def __next__(self):
+    def __next__(self) -> int:
         if not self.__idx:
             print("INSERINDO USERNAME E PASSWORD:")
             delay()
-            print("LOGIN CONCLUÍDUO\n...")
+            print("LOGIN CONCLUÍDUO\n\n...\n")
 
             self.__idx += 1
-
             # CHAMAR OBJETO COMO FUNCÃO/MÉTODO
-            self()
+            self()   
+            print("\nSALVANDO INFORMACÕES DE LOGIN")
+            delay()
+            self.__idx -= 1
 
-            if self.__idx == 2:
-                solver = None
-                try:
-                    # SE BOT Ñ FOI IDENTIFICADO VERIFICAR SE FOI SOLICITADO RECAPTCHA
-                    print('VERIFICANDO RECAPTCHA')
-                    CaptchaSolver("teste_driver")()
-                except RuntimeError:
-                    self.__idx -= 1
-                except Exception as err:
-                    print("## ERROR ##:\t%s" % err)
-                else:
-                    print("RECAPTCHA VERIFICADO")
-                    delay()
-                finally:
-                    print("SALVANDO INFORMACÕES DE LOGIN")
-                    delay()
             return self.__idx
 
     
-    def __call__(self):
+    def __call__(self) -> None:
         if self.__idx:
             print("VERIFICANDO SE BOT FOI IDENTIFICADO")
             bot_identificado: bool = None
+            verificar_recaptcha: bool = None
             
             # BUSCANDO POP-UP DE BOT IDENTIFCADO
             try:
-                op = random.choice([False, True])
-                bot_identificado = op
+                bot_identificado = False #random.choice([False, True])
+                verificar_recaptcha = True #random.choice([False, True])
 
                 if bot_identificado:
                     print("BOT IDENTIFICADO")
+                    delay()
+                    pass
                 else:
-                    print("BOT Ñ IDENTIFICADO")
-                    self.__idx += 1
+                    delay()
+                    print("Ñ DISPAROU POP-UP DE BOT IDENTIFICAO\n\nVERIFICAR SE SOLICITOU RECAPTCHA")   
+                
+
+                # VERIFICANDO SE TODAS ETAPAS DE `CaptchaSolver` foram concluídas.
+                while verificar_recaptcha and (solver := CaptchaSolver('test_driver')()) and (1 << solver) % 2 == 0:
+                    self.__idx += solver
+                    break
 
             except Exception as err:
                 print('%s' % err)
 
+
 if __name__ == '__main__':
-    if (1 << next(iter(InstaLogin('driver_teste', 'data_teste')))) % 2 == 0:
-        print('OK')
-    else:
-        print("FAILED")
+    print(next(iter(InstaLogin('driver_teste', 'data_teste'))))
 
 

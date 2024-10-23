@@ -46,46 +46,32 @@ class CaptchaSolver:
             self.submit_response
         )
     
-    def __aiter__(self):
+    def __iter__(self):
         # RETORNAR OBJETO COMO ITERADOR ASSÍNCRONO
         self.__idx: int = 0
         return self
     
-    def __call__(self):
-        # UM WRAPPER PARA AS COROUTINAS DO OBJETO
-        event = asyncio.new_event_loop()
-        task = event.create_task(self.mainloop())
+    def __call__(self) -> int:
+        iter(self)
+        while True:
+            try:
+                next(self)
+            except StopIteration:
+                return self.__idx
 
-        event.run_until_complete(task)
-
-        awaitable = asyncio.all_tasks(loop=event)
-        for task in awaitable:
-            task.cancel()
-
-        gather = asyncio.gather(*awaitable)
-        event.run_until_complete(gather)
-        event.close()
-
-
-    async def __anext__(self):
+    def __next__(self):
         if self.__idx >= len(self.steps):
+            self.__idx = (self.__idx - len(self.steps)) + 1
             raise StopIteration
         else:
             # buscando posicão índice de qual etapa
             # Buscando qual etapa se encontra o objeto
             step = self.steps[self.__idx]
             self.__idx += 1
-            await step()  # instânciando métodos
-
-
-    async def mainloop(self):
-        # CHAMANDO ITERADOR DO OBJETO
-        async for step in self:
-            pass
-        return self.__idx
+            asyncio.run(step())  # instânciando métodos
 
     #############################################################################
-    #       PRINCIPAIS ETAPAS MÉTODOS EXECUTADOS DENTRO DO ITERADOR             #
+    ##      PRINCIPAIS ETAPAS MÉTODOS EXECUTADOS DENTRO DO ITERADOR            ##
     #############################################################################
     async def acess_captcha_frame(self):
         print("## INFO ##: ACESSANDO FRAME DO `ReCaptcha`")
@@ -104,7 +90,7 @@ class CaptchaSolver:
     
     async def download_audio(self):
         print("## INFO ##: BAIXANDO ARQUIVO DE AUDIO")
-        delay('high')
+        delay('low')
         xaudio = '** AQUI VAI TER A FONTE DO AUDIO **'
         print("## INFO ##: FONTE ÁUDIO[%s]" % xaudio)
     
@@ -119,4 +105,6 @@ class CaptchaSolver:
 
 
 if __name__ == '__main__':
-    CaptchaSolver('teste_driver')()
+    while (solver := CaptchaSolver('teste_driver')()) and (1 << solver) % 2 == 0:
+        print(solver)
+        break

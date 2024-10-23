@@ -29,9 +29,9 @@ class CookiesManager:
                     print("## INFO ##:\t ARMAZENANDO COOKIES")
                     # ARMAZENAR COOKIES DE SESSÕES CONCLUÍDAS
                     self.cookies = self._driver.get_cookies()
-                    with open("services/app/cookies@%s.json" % self._user, "w") as file:   #
-                        json.dump(self.cookies, file)       #
-                    #########################################
+                    with open("services/app/cookies@%s.json" % self._user, "w") as file:   
+                        json.dump(self.cookies, file)       
+                    
 
                 #CASO QUEIRA UTILIZAR COOKIES DE SESSÕES ANTERIORES
                 elif self._op == 'release':
