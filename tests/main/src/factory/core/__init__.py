@@ -25,8 +25,8 @@ class Meta(type):
     def __new__(meta, name, bases, attrs):
 
         # Controlando alteracão de estado e saída através de metaclasses
-        if 'flush' in attrs and attrs['flush'] is ...:
-            attrs['flush'] = Descriptor()  # Fazendo refrência através do protocolo descritor
+        if 'run' in attrs and attrs['run'] is ...:
+            attrs['run'] = Descriptor()  # Fazendo refrência através do protocolo descritor
         return type.__new__(meta, name, bases, attrs)
     
     def __call__(cls, *arg, **kw):

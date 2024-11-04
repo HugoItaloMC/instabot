@@ -1,21 +1,11 @@
-from src.factory.tools.utils import Login
-from src.factory.abs import AbstractLike, AbstractComment, AbstractFollow, AbstractUnfollow
-
+from src.factory.asset import Login
+from src.factory.factory import AbstractFactory
 __all__ = ['Factory']
 
-
-class Like(AbstractLike): flush = ...
-
-class Comment(AbstractComment): flush = ...
-
-class Follow(AbstractFollow): flush = ...
-
-class Unfollow(AbstractUnfollow): flush = ...
-
-
-# Factory, chama classes concretas na qual referência classes Abstratas contendo tarefas solicitadas pelo frontend
-class Factory:
+# Factory instância classes concretas na qual referência classes Abstratas contendo tarefas solicitadas
+class Factory(AbstractFactory):
     def __init__(self, data: tuple):
+        super().__init__()
         self.__data = data
     
     def __iter__(self):
@@ -25,19 +15,20 @@ class Factory:
         while tasks:
             if 'comment' in tasks:
                 tasks.discard('comment')
-                yield Comment()
+                yield self._comment()
             
             elif 'like' in tasks:
                 tasks.discard('like')
-                yield Like()
+                yield self._like()
             
             elif 'follow' in tasks:
                 tasks.discard('follow')
-                yield Follow()
+                yield self._follow()
             
             elif 'unfollow' in tasks:
                 tasks.discard('unfollow')
-                yield Unfollow()
+                yield self._unfollow()
+                
             else:
                 tasks.close()
         yield
