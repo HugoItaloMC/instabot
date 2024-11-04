@@ -3,6 +3,7 @@ from collections import namedtuple
 from login import InstaLogin
 from like import InstaLike
 from comment import InstaComment
+from follow import InstaFollow
 
 
 ### TOOL TO DELAY #######################################
@@ -44,7 +45,7 @@ class Driver:
 
         ## DEFAULT PIPES ##########################
         self.__pipes: dict = dict(LIKE=InstaLike, ########################################                                                                                 
-                                COMMENT=InstaComment, FOLLOW='PIPE PRA SEGUIR USUÁRIO', ##
+                                COMMENT=InstaComment, FOLLOW=InstaFollow, ##
                                 UNFOLLOW='PIPE PARA DEIXAR DE SEGUIR USUÁRIO')          ##
         ##################################################################################
         
@@ -103,7 +104,7 @@ class Driver:
 if __name__ == '__main__':
 
     # A classe Driver retorna 0, se retornar qualquer valor alguma excessão foi levantada
-    while not (driver := Driver('test_data', ('LIKE','COMMENT'))()) and not driver:
+    while not (driver := Driver('test_data', ('LIKE','COMMENT', 'FOLLOW'))()) and not driver:
         print('OK')
         break
     else:

@@ -30,27 +30,21 @@ class CookiesManager:
     
     def __iter__(self):
         self.__user: str = self.__args[0]
-        self.__op: set = set(self.__args[1])  # args[1]: tuple
+        self.__op: set = set(self.__args[1]) if not self.__args[1] == str else self.__args[1].split() # args[1]: tuple
         self.__idx: int = 0
         return self  # RETORNANDO ITERADOR DO OBJETO
     
 
     def __next__(self):
-
         if not self.__idx:
-            print(self.__op)
-            while (idx := self()) and idx >= len(self.__op):
+            while (idx := self()) and idx is not len(self.__op):
                 raise StopIteration
-        # NO TOTAL SÃO 2 OPERACÕES, CASO AS DUAS SEJA REALIZADAS FORMATAR INDICE PARA SEMPRE RETORNAR 1
+            # NO TOTAL SÃO 2 OPERACÕES, CASO AS DUAS SEJA REALIZADAS FORMATAR INDICE PARA SEMPRE RETORNAR 1
         return (self.__idx - len(self.__args[1])) + 1 if len(set(self.__args[1])) == 2 else 0
     
     def __call__(self):
         try:
             while self.__op:
-                if len(self.__op) >= 2:
-                    print("QUANTIDADE EXCESSIVA DE OPERACÕES")
-                    delay()
-                    break
 
                 op = self.__op.pop()
 
@@ -67,12 +61,14 @@ class CookiesManager:
                     delay()
                     self.__idx -= 1
                     break
-            
+
         except StopIteration:
             return self.__idx
+        
         except Exception as err:
             print("## ERR ##:\t%s" % err)
         
 
-if __name__ == '__main__':(
-    print(next(iter(CookiesManager('test_driver', 'oitalocorreia', ('RELEASE'))))))
+if __name__ == '__main__':
+    cookiesmgr =  iter(CookiesManager('test_driver', 'oitalocorreia', ('RELEASE', 'RENEW')))
+    next(cookiesmgr)
