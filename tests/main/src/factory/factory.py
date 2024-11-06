@@ -1,16 +1,19 @@
-from src.factory.abs import AbstractLike, AbstractComment, AbstractFollow, AbstractUnfollow
+from src.factory.abstracts import * 
+__all__ = ['AbstractFactory']
+#### CONCRETS CLASS  ########################
+#`run` refrência descritor da classe Handler#
+class Like(AbstractLike): run = ...         #
+                                            #
+class Comment(AbstractComment): run = ...   #
+                                            #
+class Follow(AbstractFollow): run = ...     #
+                                            #
+class Unfollow(AbstractUnfollow): run = ... #
+#############################################
 
-#### CONCRETS CLASS  ##########################
-class Like(AbstractLike): flush = ...         #
-                                              #
-class Comment(AbstractComment): flush = ...   #
-                                              #
-class Follow(AbstractFollow): flush = ...     #
-                                              #
-class Unfollow(AbstractUnfollow): flush = ... #
-###############################################
-
+# AbstractFactory instância classes Concretas que herdam de classes Abstratas contendo tarefas solicitadas
 class AbstractFactory:
+    # Refrênciando classes concretas em atributos  métodos
 
     def _like(self):
         return Like()
@@ -20,7 +23,7 @@ class AbstractFactory:
     
     def _follow(self):
         return Follow()
-
+    
     def _unfollow(self):
         return Unfollow()
     

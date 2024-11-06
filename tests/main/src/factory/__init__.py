@@ -1,8 +1,8 @@
 from src.factory.asset import Login
-from src.factory.factory import AbstractFactory
+from src.factory.factory import *
 __all__ = ['Factory']
 
-# Factory instância classes concretas na qual referência classes Abstratas contendo tarefas solicitadas
+# Factory, classe concreta de AbstractFactory que acessa classes Concretas através de métodos
 class Factory(AbstractFactory):
     def __init__(self, data: tuple):
         super().__init__()

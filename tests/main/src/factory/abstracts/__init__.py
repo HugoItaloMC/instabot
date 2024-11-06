@@ -1,5 +1,5 @@
 from src.factory.core import Handler
-
+__all__ = ['AbstractLike', 'AbstractComment', 'AbstractFollow', 'AbstractUnfollow']
 
 class AbstractLike(Handler):
 
