@@ -1,88 +1,128 @@
+from queue import Queue
+from itertools import islice
+from typing import Coroutine
+
 import PySimpleGUIQt as pygui
+from template.main_template import MainBox
+from template.tasks_template import TasksBox
 __all__ = ['Template']
 
 class Template:
 
-    def __init__(self, schema):
+    def __init__(self, schema) -> None:
         self.__schema: object = schema  # Data-classe dados recebidos através do template
-        self.__window = pygui.FlexForm(title='THE SIMPLE GUI', size=(640, 480))
-        self.__LAYOUT: list = [
-        [pygui.Stretch(),pygui.Text("INSTABOT\nTool", size=(60, 2), font=("Goto", 20), justification='center'), pygui.Stretch()],
-        [pygui.Text('_' * 80, justification='center')],
-        [pygui.Text("Your username and password Instagram:", font=("Goto", 15), justification='center')],
         
-        [pygui.Stretch(), pygui.Text('User:', size=(5, 1)),
-        pygui.InputText(key='username', justification='center',size=(10, 1)),
-        pygui.Text('Pass', size=(6, 1), justification='center'),
-        pygui.InputText(justification='center',size=(10, 1), key='password', password_char='*'), pygui.Stretch()],
-        [pygui.Text('=' * 80, justification='center')
-        ],
+        self.__window_tasks: 'PySimpleGUIQt.Window' = None
+        self.__window_main: 'PySimpleGUIQt.Window' = None
         
-        [pygui.Text("TASKS", justification='center', font=("Goto", 15))],
-        [pygui.Text("_" * 80, justification='center')],
-        
-        [pygui.Stretch(),pygui.Checkbox('LIKE', font=("Sans-serif", 10), key='like'),
-        pygui.Checkbox('COMMENT', font=("Sans-serif", 10), key='comment'),
-        pygui.Checkbox('FOLLOW', font=("Sans-serif", 10), key='follow'),
-        pygui.Checkbox('UNFOLLOW', font=("Sans-serif", 10), key='unfollow'), pygui.Stretch()],
-        [pygui.Text('_' * 80, justification='center')
-        ],
-        [pygui.Text('Open file with users to do tasks (like, comment, follow, unfollow)\nsupport files: (*.json, *.csv, *.xlsx)', justification='center')],
-        [pygui.Stretch(),pygui.Text("Open file", size=(10, 1), auto_size_text=False, font=("Goto", 15)), 
-        pygui.InputText("path to file", key='path', justification='left', size=(30, 1), font=("Goto", 15)), 
-        pygui.FileBrowse(file_types=(('JSON', '*.json'), ("EXCEL", "*.xlsx"), ("CSV", "*.csv"))), pygui.Stretch()],
-        [pygui.Stretch(), pygui.Button('start', size=(100, 30), key='start_task'), pygui.Button('stop', size=(100, 30), key='stop'), pygui.Stretch()],
-        [pygui.Text('_' * 60, justification='center')],
-        [pygui.Stretch(), pygui.Multiline(size=(50, 10), key='status', disabled=True, autoscroll=True), pygui.Stretch()]
-        ]
     
-    def __iter__(self):
-        # GLOBAL VAR
-        global factory, login, like, comment, follow, unfollow
-        factory = None
-        login = None
-        like = None
-        comment = None
-        follow = None
-        unfollow = None
+    def __iter__(self) -> object:
+        global factory, tasks 
+        if self.__window_main is None:
+            self.__window_main = pygui.Window('Main Menu', MainBox(gui_engine=pygui).get(), finalize=True)
+        else:
+            self.__window_main.close()
 
-        self.__window.Layout(self.__LAYOUT)
         while True:
-            event, values = self.__window.read()
+            # LOCAL VAR
+            queue = Queue()
+
+            # GLOBAL VAR
+            factory = None
+            tasks = None
+
+            # VERIFICANDO EVENTOS E DADOS
+            event, values = self.__window_main.read()
 
             if event in (None, 'stop'):
-                exit()
+                self.__window_main.close()
 
+            # BEGIN TEMPLATE
             if event == 'start_task':
-
-                schema = iter(self.__schema(Request=(values['username'], values['password'], values['path'])))
-                next(schema)
-                queue = schema.send('QUEUE')
-
-                while not queue.empty():
-                    factory = queue.get()
+                self.__window_main.close()  # CLOSED MAIN WINDOW
                 
+                # ENVIANDO DADOS    
+                schema: Coroutine = iter(self.__schema(Request=(values['username'], values['password'], values['path'])))
+                next(schema)
+                
+                # BUSCANDO QUEUE
+                __queue = schema.send('QUEUE')
+
+                # RECOLHENDO REFERÊNCIAS DENTRO DA QUEUE
+                while not __queue.empty():
+                    factory = __queue.get()
+
             if factory is not None:
-                next(factory)
-            self.__window.Refresh()
-            self.__window['status'].update('INICIANDO BOT')
-            self.__window['status'].get()
-            login = factory.send({key for key, _ in values.items() if type(_) is not str and _})  # Default
+                # Armazenando instância da classe concret `Login` na fila principal
+                queue.put(next(factory))
             
 
-            try:
-                comment = factory.send('comment')
-                like = factory.send('like')
-                follow = factory.send('follow')
-                unfollow = factory.send('unfollow')
+            # VERIFICANDO TAREFAS SOLICITADAS
+            tasks = {key for key, _ in values.items() if type(_) is not str and _}
 
+ 
+            #print(tasks)  # LOG
+            
+            try:
+                # Iniciando corroutina para buscar tarefas solicitadas, ñ retorna nenhum valor através do ponteiro
+                factory.send(bool(tasks))
+                
+                # Armazenando tarefas `concrets na fila`
+                factory.send(tasks.copy())
+                for line in range(1, len(tasks)+1):
+                    queue.put(factory.send(bool(line)))
                 # Tratando exceptions default de corroutinas >> `factory e schema`
-                factory.send(True)
-                schema.send(True)
             except StopIteration:
                 factory.close()
                 schema.close()
-                #print(login.__dict__, comment._state, like._state, follow._state, unfollow._state)
+            except AttributeError:
+                exit()
+            except Exception:
+                exit(2)
+            
+            # CLASSES `Concrets`
+            Login: object = None
+            Comment: object  = None
+            Like: object = None
+            Follow: object = None
+            Unfollow: object = None
+
+            # GET Concrets
+            while not queue.empty():
+                Login = queue.get()
+                if 'comment' in tasks:
+                    Comment = queue.get()
+                if 'like' in tasks:
+                    Like = queue.get()
+                if 'follow' in tasks:
+                    Follow = queue.get()
+                if 'unfollow' in tasks:
+                    Unfollow = queue.get()
+
                 
-        self.__window.close()
+
+            # BEGIN MENU TASKS
+            Login.run()
+            while True:
+
+                if self.__window_tasks is None:
+                    self.__window_tasks = pygui.Window('Menu Tasks', TasksBox(tasks=tasks.copy(), gui_engine=pygui).get(), finalize=True)
+                    
+                event, _ = self.__window_tasks.read(timeout=None)
+                if event in (pygui.WIN_CLOSED, None, 'STOP'):
+                    exit()
+                print('\n Event: %s\n' % event, 'Concrets:\t%s' % Login, Comment, Like, Follow, Unfollow, '\n')  # LOG
+                
+
+                if event == 'start_comment':
+                    Comment.run() if Comment else None
+                elif event == 'start_like':
+                    Like.run() if Like else None
+                elif event == 'start_follow':
+                    Follow.run() if Follow  else None
+                elif event == 'start_unfollow':
+                    Unfollow.run() if Unfollow else None
+                else:
+                    exit()
+
         return self

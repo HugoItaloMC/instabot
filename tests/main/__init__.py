@@ -1,6 +1,7 @@
 from collections import namedtuple
 from src import *
 __all__ = ['Schema']
+
 class Schema:
     # Client Data-Class
     def __init__(self, Request: namedtuple = namedtuple("Request", ("username", "passwd", "path"))):
