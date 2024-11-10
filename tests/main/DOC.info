@@ -1,0 +1,19 @@
+main  # PRINCIPAL PASTA
+  `src`  # CÓDIGO FONTE
+    `factory`  # FÁBRICA DE REGRAS
+      `rules`  # REGRAS - CONTÉM CLASSES ABSTRATAS E CONCRETAS
+          __init__.py  # Contém as classes concretas e abstratas, controla as importações, chama DESCRITOR
+          abs.py  # Classes abstratas (regras)
+      `core.py`  # CLASSE HANDLER COM SUA META-CLASSE E DESCRITOR, PRINCIPAL INSTÂNCIA
+          __init__.py  # Classe handler, controla atributos em comum de estado e saída e execucão de sub-Classes
+      __init__.py # Factory(AbstractFactory) - Factory concreta
+      factory.py  # AbstractFactory - Implementação da fábrica abstrada, essa que a Facade envia para Template
+     __init__.py  # Classe Facade - gerencia as chamadas da facade
+  `template`
+      __init__.py  # Contém a classe Template para layouts `Menu Principal/Menu tasks` e gerencia as chamadas das tarefas recebidas atraveś dos layouts
+     main_template.py  # Layout Menu inicial
+     tasks_template.py  # Layout Menu Tarefas
+    `utils`  # FERRAMENTAS UTILITÁRIAS, LER ARQUIVOS, GERAR ALEATORIAMENTE STRINGS OU NÚMEROS
+      __init__.py # Classe utilitária geral
+  __main__.py  # Executor do código em nível de client
+  __init__.py  # Classe Schema na qual referencia os dados vistos pelo usuário/client
