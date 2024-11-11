@@ -10,7 +10,7 @@ A estrutura do projeto foi organizada para garantir uma boa separação de respo
 - **factory**: Contém as fábricas de regras e a lógica central de criação.
   - **rules**: Contém as classes de regras de negócio, tanto abstratas quanto concretas.
       >__\_\_init\_\___.__py__: Classes concretas `produtos concretos do Padrão Factory`
-       <br>__abs__.__py__: classes abstratas `produtos abstrados do padrão Factory` 
+       <br>__abs__.__py__: classes abstratas `produtos abstratos do padrão Factory` 
   - **core**: Contém a classe Handler, que controla o estado e a execução das regras.
   - **factory.py**: Implementação da fábrica abstrata, responsável pela criação das instâncias.
   - **__\_\_init\_\___.py**: Contém a Factory concreta, que organiza o fluxo de criação de objetos.

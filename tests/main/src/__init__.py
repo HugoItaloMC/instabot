@@ -1,5 +1,4 @@
 from typing import Generator, Coroutine
-from queue import Queue
 
 from src.factory import *
 __all__ = ['Facade']
@@ -9,14 +8,11 @@ class Facade:
 
     def __init__(self, args: Generator):
         # args
-        self.__queue = Queue()
         self.__args: Generator[Coroutine] = args
         self.__data: tuple = (next(self.__args), next(self.__args))
-        self.__factory = iter(Factory(self.__data))
-        self.__queue.put(self.__factory)
+        self.__factory: object = iter(Factory(self.__data))
     
     def __iter__(self):
-        send = yield
-        if 'QUEUE' in send.upper():
-            yield self.__queue
+        send: str = yield self.__factory
+        raise StopIteration
 

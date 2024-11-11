@@ -8,28 +8,14 @@ class Factory(AbstractFactory):
         self.__data = data
     
     def __iter__(self):
-        yield self._login(self.__data)
-        
-        tasks: set = yield
         yield
-        while tasks:
-            if 'comment' in tasks:
-                tasks.discard('comment')
-                yield self._comment()
+        TASKS = (self._login(self.__data), 
+                self._comment(), 
+                self._like(), 
+                self._follow(), 
+                self._unfollow())
+        for task in TASKS:
+            xbool: bool = yield task 
+        raise StopIteration
 
-            elif 'like' in tasks:
-                tasks.discard('like')
-                yield self._like()
-        
-            elif 'follow' in tasks:
-                tasks.discard('follow')
-                yield self._follow()
-                
-        
-            elif 'unfollow' in tasks:
-                tasks.discard('unfollow')
-                yield self._unfollow()
-                                
-            else:
-                exit(2)
         
