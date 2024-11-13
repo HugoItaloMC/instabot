@@ -4,8 +4,8 @@ __obj__ = (Schema, Template)
 __all__ = [None]
 
 if __name__ == '__main__':
-    __main__ = None
     try:
+        __main__ = None
         for obj in __obj__:
             if __main__ is not None:
                 for line in obj(schema=__main__): ...

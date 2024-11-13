@@ -1,3 +1,8 @@
+#  GERENCIADORES DO CHROMEDRIVER
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+
 from src.factory.factory import *
 __all__ = ['Factory']
 
@@ -15,7 +20,7 @@ class Factory(AbstractFactory):
                 self._follow(), 
                 self._unfollow())
         for task in TASKS:
-            xbool: bool = yield task 
-        raise StopIteration
+            xbool: bool = yield task
+        
 
         

@@ -1,23 +1,32 @@
+#from weakref import WeakKeyDictionary
+
 # Pythoon defaults imports
 from abc import abstractmethod
 
+from src.assets import *
 __all__ = ['Handler']  # CONTROLANDO IMPORTACÃO DO MÓDULO
 
-class Descriptor:
+class DescriptorHandler:
     #  Descriptor de atributos da classe Handler
     # controla seu comportamento
 
-    def __set_name__(self, owner, name):
-        self.name = name
-
-    def __set__(self, instance):
-        raise AttributeError("%s Attr just read" % self.name)
-    
+    def __set__(self, instance, value):
+        if instance:
+            self._values['instance'] = value
+        
     def __get__(self, instance, owner):
+        
         if instance is None:
+            self._values['instance'] = None
             return self
-
-        return lambda: next(instance())
+        
+        if not hasattr(self, '_values'):
+            #self._values = WeakKeyDictionary()
+            self._values = {}
+        
+        self._values['instance'] = instance
+    
+        return lambda: next(self._values['instance']())
 
 
 class Meta(type):
@@ -26,7 +35,7 @@ class Meta(type):
 
         # Controlando alteracão de estado e saída através de metaclasses
         if 'run' in attrs and attrs['run'] is ...:
-            attrs['run'] = Descriptor()  # Fazendo refrência através do protocolo descritor
+            attrs['run'] = DescriptorHandler()  # Fazendo refrência através do protocolo descritor
         return type.__new__(meta, name, bases, attrs)
     
     def __call__(cls, *arg, **kw):
@@ -37,12 +46,13 @@ class Meta(type):
 
 
 class Handler(metaclass=Meta):
-    # Handler, controla estado e saída
+    # Handler, controla estado e saída e atributos em comum de `rules`
 
     def __init__(self):
         self._exit  = 0  # Controlador de saída
         self._state = False  # Controlador de estado
-
+        self._driver = SeleniumDriver().driver  # Driver Selenium
+        
     # //// GERENCIANDO SAÍDAS E ESTADO ATRAVÉS DE OPERADORES UNÁRIOS /////
     def __pos__(self):                #      OPERADOR POSITIVO :         #
         if not self._exit:            #       exemplo: obj = Class(25)   #
