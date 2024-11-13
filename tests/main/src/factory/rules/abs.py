@@ -49,14 +49,15 @@ class AbstractLogin(Handler):
                 # Ñ SALVAR INFORMACÕES DE LOGIN
                 try:
                     delay('LOW')
-                    actions.move_to_element(WebDriverWait(self._driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), 'Not now')]")))).click().perform()
+                    actions.move_to_element(WebDriverWait(self._driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@role='button' and @tabindex='0' and contains(text(), 'Not now')]")))).click().perform()
                 except Exception as e:
                     print(e)
+
                 
+                # Ñ PERMITIR NOTIFICACÕES
                 try:
                     delay('LOW')
-                    # Ñ PERMITIR NOTIFICACÕES
-                    actions.move_to_element(WebDriverWait(self._driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[text()='Not Now')]")))).click().perform()
+                    actions.move_to_element(WebDriverWait(self._driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[text()='Not')]")))).click().perform()
                 except Exception as e:
                     print('Ń pediu para enviar notificacões')
 
