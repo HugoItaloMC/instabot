@@ -18,7 +18,7 @@ class AbstractLogin(Handler):
     
     
     def __next__(self):
-        +self
+        +self  
         if self._driver is not None:
             actions = ActionChains(self._driver)
         while self._exit > 0:

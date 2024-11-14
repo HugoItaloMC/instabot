@@ -6,8 +6,9 @@ __all__ =['SeleniumDriver']
 
 class DriverDescriptor:
     def __get__(self, instance, owner):
-        if instance._driver is None:
+        if instance._driver is ...:
             options = webdriver.ChromeOptions()
+            options.add_argument('user-data-dir=$HOME')
             options.add_argument("--start-minimized")
             options.add_argument("--disable-extensions")
             options.add_argument("--disable-popup-blocking")
@@ -16,6 +17,8 @@ class DriverDescriptor:
             options.add_argument("--disable-blink-features=AutomationControlled")
             options.add_argument("--enable-features=BlockThirdPartyCookies")
             options.binary_location = '/usr/bin/google-chrome'
+            options.add_experimental_option("excludeSwitches", ["enable-automation"])
+            options.add_experimental_option('useAutomationExtension', False)
 
             instance._driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
             
@@ -45,12 +48,12 @@ class DriverDescriptor:
 
 
 class SeleniumDriver:
-    _instance = None
-    _driver = None  # Atributo controlado pelo descritor
+    _driver: 'selenium.webdriver' = ...  # Atributo controlado pelo descritor
     
     driver = DriverDescriptor()
 
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(SeleniumDriver, cls).__new__(cls)
+    def __new__(cls, *arg, **kw):
+        # Singleton webdriver
+        if not hasattr(cls, '_instance'):
+            cls._instance = super(SeleniumDriver, cls).__new__(cls, *arg, **kw)
         return cls._instance

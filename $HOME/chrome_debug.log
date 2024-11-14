@@ -1,0 +1,12 @@
+[43213:43213:1114/092216.781826:WARNING:chrome_main_delegate.cc(747)] This is Chrome version 129.0.6668.89 (not a warning)
+[43213:43213:1114/092216.968304:INFO:chrome_browser_cloud_management_controller.cc(196)] No machine level policy manager exists.
+[43256:43256:1114/092217.154955:WARNING:sandbox_linux.cc(430)] InitializeSandbox() called with multiple threads in process gpu-process.
+[43256:43256:1114/092217.156107:WARNING:viz_main_impl.cc(85)] VizNullHypothesis is disabled (not a warning)
+[43213:43213:1114/092227.874718:WARNING:controller_impl.cc(1192)] Background download complete, client: 6, completion type: 0, file size:265059
+[43213:43213:1114/092228.105218:WARNING:controller_impl.cc(1192)] Background download complete, client: 6, completion type: 0, file size:5155
+[43213:43213:1114/092228.840570:WARNING:controller_impl.cc(1192)] Background download complete, client: 6, completion type: 0, file size:2200227
+[43213:43213:1114/092228.984058:WARNING:controller_impl.cc(1192)] Background download complete, client: 6, completion type: 0, file size:45161
+[43213:43213:1114/092229.369658:WARNING:controller_impl.cc(1192)] Background download complete, client: 6, completion type: 0, file size:4680
+[43213:43213:1114/092229.672178:WARNING:controller_impl.cc(1192)] Background download complete, client: 6, completion type: 0, file size:2747168
+[43213:43213:1114/092230.491281:WARNING:controller_impl.cc(1192)] Background download complete, client: 6, completion type: 0, file size:118577
+[43213:43213:1114/092239.722468:WARNING:controller_impl.cc(1192)] Background download complete, client: 6, completion type: 0, file size:68666027
