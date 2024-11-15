@@ -8,7 +8,7 @@ class DriverDescriptor:
     def __get__(self, instance, owner):
         if instance._driver is ...:
             options = webdriver.ChromeOptions()
-            options.add_argument('user-data-dir=$HOME')
+            options.add_argument('user-data-dir=/home/italo')
             options.add_argument("--start-minimized")
             options.add_argument("--disable-extensions")
             options.add_argument("--disable-popup-blocking")
@@ -27,7 +27,7 @@ class DriverDescriptor:
             
             # Define User-Agent e Headers HTTP
             headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-                        "(KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36",
+                        "(KHTML, like Gecko) Chrome/122.0.4183.83 Safari/537.36",
                         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
                         "Accept-Language": "en-US,en;q=0.5",
                         "Accept-Encoding": "gzip, deflate, br",

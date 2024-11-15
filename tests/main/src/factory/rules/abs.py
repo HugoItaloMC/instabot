@@ -6,7 +6,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from src.factory.core import *
-from src.utils.sleepnice import delay
+from src.utils import delay
 __all__ = ['AbstractLike', 'AbstractComment', 'AbstractFollow', 'AbstractUnfollow', 'AbstractLogin']
 
 
@@ -41,7 +41,7 @@ class AbstractLogin(Handler):
                 try:
                     delay('LOW')
                     actions.move_to_element(WebDriverWait(self._driver, 10).until(
-                    EC.elemento_to_be_clickable((By.XPATH, "//span[contains(text(), 'Ignore')]")))).click().perform()    
+                    EC.elemento_to_be_clickable((By.XPATH, "//span[contains(text(), 'Dismiss')]")))).click().perform()    
                     print("BOT IDENTIFICADO")
                 except Exception as e:
                     print("BOT Ñ IDENTIFICADO")
@@ -71,14 +71,17 @@ class AbstractLogin(Handler):
 
 class AbstractLike(Handler):
 
-    def __init__(self):
+    def __init__(self, users: set):
         super().__init__()
+        self.__users: set = users
     
     def __next__(self):
         +self            
-        while self._exit > 0:
+        while (users := self.__users.copy()) and self._exit > 0:
             -self
-            print('Executando Next de %s' % self)
+            while users:
+                self._driver.get('http://www.instagram.com/%s' % users.pop())
+                delay('LOW')
         else:
             +self
             ~self
@@ -88,14 +91,19 @@ class AbstractLike(Handler):
 class AbstractComment(Handler):
 
 
-    def __init__(self):
+    def __init__(self, users: set):
         super().__init__()
+        self.__users: set = users
     
     def __next__(self):
         +self            
-        while self._exit > 0:
-            -self
-            print('Executando Next de %s' % self)
+        while (users := self.__users.copy()) and self._exit > 0:
+            if self._driver is not None:
+                -self
+            while users:
+                self._driver.get("https://www.instagram.com/%s" % users.pop())
+                delay('LOW')
+
         else:
             +self
             ~self
@@ -105,15 +113,20 @@ class AbstractComment(Handler):
 class AbstractFollow(Handler):
 
 
-    def __init__(self):
+    def __init__(self, users: set):
         super().__init__()
+        self.__users: set = users
     
     def __next__(self):
         +self
             
-        while self._exit > 0:
-            -self
-            print('Executando Next de %s' % self)
+        while (users := self.__users.copy()) and self._exit > 0:
+            if self._driver is not None:
+                -self
+            while users:
+                self._driver.get("https://www.instagram.com/%s" % users.pop())
+                delay('LOW')
+            
         else:
             +self
             ~self
@@ -122,14 +135,18 @@ class AbstractFollow(Handler):
 
 class AbstractUnfollow(Handler):
 
-    def __init__(self):
+    def __init__(self, users: set):
         super().__init__()
+        self.__users: set = users
 
     def __next__(self):
         +self    
-        while self._exit > 0:
-            -self
-            print('Executando Next de %s' % self)
+        while (users := self.__users.copy())and self._exit > 0:
+            if self._driver is not None:
+                -self
+            while users:
+                self._driver.get("http://www.instagram.com/%s" % users.pop())
+                delay('LOW')
         else:
             +self
             ~self

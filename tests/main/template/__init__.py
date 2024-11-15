@@ -2,6 +2,7 @@ from typing import Coroutine
 
 import PySimpleGUIQt as pygui
 
+from src.utils import *
 from template.main_template import MainBox
 from template.tasks_template import TasksBox
 __all__ = ['Template']
@@ -16,7 +17,7 @@ class Template:
         
     
     def __iter__(self) -> object:
-        global factory, tasks, Login, Like, Comment, Follow, Unfollow
+        global factory, tasks, users, Login, Like, Comment, Follow, Unfollow
         if self.__window_main is None:
             self.__window_main = pygui.Window('Main Menu', MainBox(gui_engine=pygui).get(), finalize=True)
         else:
@@ -27,6 +28,7 @@ class Template:
             # GLOBAL VAR
             factory = None
             tasks = None
+            users = None
 
             # CLASSES `Concrets`
             Login = None
@@ -50,6 +52,7 @@ class Template:
                 # BUSCANDO FACTORY
                 factory = next(schema)
                 
+                
                 if factory is not None:
                     next(factory)
             
@@ -70,9 +73,10 @@ class Template:
             # BEGIN MENU TASKS
             Login.run()
             while True:
-
+                
+                users = iter(UsersJsonUtils(path=values['path']))
                 if self.__window_tasks is None:
-                    self.__window_tasks = pygui.Window('Menu Tasks', TasksBox(tasks=tasks.copy(), gui_engine=pygui).get(), finalize=True)
+                    self.__window_tasks = pygui.Window('Menu Tasks', TasksBox(tasks=tasks.copy(), gui_engine=pygui, users=next(users)).get(), finalize=True)
                         
                 event, _ = self.__window_tasks.read(timeout=None)
                 if event in (pygui.WIN_CLOSED, None, 'STOP'):

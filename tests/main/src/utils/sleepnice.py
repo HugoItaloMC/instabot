@@ -1,6 +1,6 @@
 import random
 import time
-
+__all__ = ['delay']
 
 def delay(frequency: str = ''):
     frequency.lower()

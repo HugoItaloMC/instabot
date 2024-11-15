@@ -5,18 +5,18 @@ __all__ = ['AbstractFactory']
 class AbstractFactory:
     # Refrênciando classes concretas em atributos  métodos
 
-    def _login(self, data):
+    def _login(self, data: tuple):
         return Login(data)
 
-    def _like(self):
-        return Like()
+    def _like(self, users: set):
+        return Like(users=users)
 
-    def _comment(self):
-        return Comment()
+    def _comment(self, users: set):
+        return Comment(users=users)
     
-    def _follow(self):
-        return Follow()
+    def _follow(self, users: set):
+        return Follow(users=users)
     
-    def _unfollow(self):
-        return Unfollow()
+    def _unfollow(self, users: set):
+        return Unfollow(users=users)
     
