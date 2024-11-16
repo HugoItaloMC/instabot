@@ -5,11 +5,7 @@ __all__ = ['Login', 'Like', 'Comment', 'Follow', 'Unfollow']
 # Attr `run` apontado na meta-class          ##
 # refrênciando descritor da classe Handler   ##
                                              ##
-class Login(AbstractLogin):                  ##
-    run = ...                                ##
-    def __init__(self, data: tuple):         ##
-        super().__init__(data)               ##
-                                             ##
+class Login(AbstractLogin): run = ...        ##
                                              ##
 class Like(AbstractLike): run = ...          ##
                                              ##
